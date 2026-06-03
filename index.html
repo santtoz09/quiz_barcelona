@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz Barcelona</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell" aria-live="polite">
+      <section id="home" class="screen screen--home is-active">
+        <div class="hero-title" aria-label="Quiz Barcelona">
+          <span class="hero-title__quiz">QUIZ</span>
+          <span class="hero-title__barcelona">BARCELONA</span>
+        </div>
+        <div class="crest crest--home" aria-hidden="true">
+          <span class="crest__top"><b>✚</b><i></i></span>
+          <strong>FCB</strong>
+          <span class="crest__bottom"></span>
+        </div>
+        <button id="startButton" class="start-button" type="button">Iniciar quiz</button>
+      </section>
+
+      <section id="quiz" class="screen screen--quiz" aria-labelledby="questionTitle">
+        <div id="questionCard" class="question-card">
+          <div class="question-layout">
+            <div class="question-content">
+              <p id="questionCounter" class="question-counter"></p>
+              <h1 id="questionTitle" class="question-title"></h1>
+              <div id="answers" class="answers"></div>
+              <div class="progress" aria-hidden="true">
+                <span id="progressFill"></span>
+              </div>
+            </div>
+            <div class="crest crest--question" aria-hidden="true">
+              <span class="crest__top"><b>✚</b><i></i></span>
+              <strong>FCB</strong>
+              <span class="crest__bottom"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="result" class="screen screen--result" aria-labelledby="resultTitle">
+        <div class="result-panel">
+          <div class="crest crest--result" aria-hidden="true">
+            <span class="crest__top"><b>✚</b><i></i></span>
+            <strong>FCB</strong>
+            <span class="crest__bottom"></span>
+          </div>
+          <div class="result-copy">
+            <h1 id="resultTitle" class="result-title">PARABÉNS</h1>
+            <p>SUA PONTUAÇÃO FOI:</p>
+            <strong id="scoreText">0/5</strong>
+            <button id="restartButton" class="start-button start-button--small" type="button">Jogar novamente</button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>
