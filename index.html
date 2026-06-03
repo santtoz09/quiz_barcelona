@@ -8,20 +8,36 @@
   </head>
   <body>
     <main class="app">
-      <section id="home" class="screen active">
+      <section id="login" class="screen active">
+        <div class="login-card">
+          <img class="shield shield-login" src="barcelona.png" alt="Escudo do Barcelona" />
+          <h1>QUIZ BARCELONA</h1>
+          <form id="loginForm" class="login-form">
+            <label for="playerName">Digite seu nome</label>
+            <input id="playerName" name="playerName" type="text" maxlength="30" autocomplete="name" required />
+            <button class="main-button login-button" type="submit">Entrar</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="home" class="screen">
         <div class="home-text">
           <h1>QUIZ</h1>
           <p>BARCELONA</p>
         </div>
 
         <img class="shield shield-home" src="barcelona.png" alt="Escudo do Barcelona" />
+        <div class="player-banner">Jogador: <span id="currentPlayerName"></span></div>
         <button id="startButton" class="main-button" type="button">Iniciar quiz</button>
       </section>
 
       <section id="quiz" class="screen">
         <div id="questionBox" class="question-box">
           <div class="question-area">
-            <p id="questionCounter" class="counter"></p>
+            <div class="quiz-meta">
+              <p id="questionCounter" class="counter"></p>
+              <p id="timerText" class="counter timer">Tempo: 00:00</p>
+            </div>
             <h2 id="questionTitle"></h2>
             <div id="answers" class="answers"></div>
           </div>
@@ -41,6 +57,13 @@
           <h2>PARABÉNS</h2>
           <p>SUA PONTUAÇÃO FOI:</p>
           <strong id="scoreText">0/5</strong>
+          <span id="finalTimeText" class="final-time">Tempo: 00:00</span>
+
+          <div class="ranking-card">
+            <h3>Ranking</h3>
+            <ol id="rankingList" class="ranking-list"></ol>
+          </div>
+
           <button id="restartButton" class="main-button small-button" type="button">Jogar novamente</button>
         </div>
       </section>

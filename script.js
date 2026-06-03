@@ -26,10 +26,17 @@ const questions = [
   },
 ];
 
+const SESSION_STORAGE_KEY = "barcelonaQuizSession";
+const RANKING_STORAGE_KEY = "barcelonaQuizRanking";
+
+const loginScreen = document.getElementById("login");
 const homeScreen = document.getElementById("home");
 const quizScreen = document.getElementById("quiz");
 const resultScreen = document.getElementById("result");
 
+const loginForm = document.getElementById("loginForm");
+const playerNameInput = document.getElementById("playerName");
+const currentPlayerName = document.getElementById("currentPlayerName");
 const startButton = document.getElementById("startButton");
 const restartButton = document.getElementById("restartButton");
 const questionBox = document.getElementById("questionBox");
@@ -38,32 +45,219 @@ const questionTitle = document.getElementById("questionTitle");
 const answersDiv = document.getElementById("answers");
 const progressFill = document.getElementById("progressFill");
 const scoreText = document.getElementById("scoreText");
+const timerText = document.getElementById("timerText");
+const finalTimeText = document.getElementById("finalTimeText");
+const rankingList = document.getElementById("rankingList");
 
+let playerName = "";
 let questionNumber = 0;
 let score = 0;
 let canAnswer = true;
+let selectedAnswers = [];
+let elapsedTime = 0;
+let timerStartedAt = null;
+let timerInterval = null;
+let nextQuestionTimeout = null;
 
 function showScreen(screen) {
+  loginScreen.classList.remove("active");
   homeScreen.classList.remove("active");
   quizScreen.classList.remove("active");
   resultScreen.classList.remove("active");
   screen.classList.add("active");
 }
 
+function formatTime(milliseconds) {
+  const totalSeconds = Math.floor(milliseconds / 1000);
+  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
+  const seconds = String(totalSeconds % 60).padStart(2, "0");
+  return minutes + ":" + seconds;
+}
+
+function getCurrentElapsedTime() {
+  if (timerStartedAt === null) {
+    return elapsedTime;
+  }
+
+  return elapsedTime + Date.now() - timerStartedAt;
+}
+
+function updateTimerText() {
+  timerText.textContent = "Tempo: " + formatTime(getCurrentElapsedTime());
+}
+
+function startTimer() {
+  stopTimer();
+  timerStartedAt = Date.now();
+  updateTimerText();
+  timerInterval = setInterval(function () {
+    updateTimerText();
+    saveSession();
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval !== null) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+
+  if (timerStartedAt !== null) {
+    elapsedTime += Date.now() - timerStartedAt;
+    timerStartedAt = null;
+  }
+}
+
+function saveSession() {
+  if (!playerName || !quizScreen.classList.contains("active")) {
+    return;
+  }
+
+  const sessionData = {
+    playerName,
+    questionNumber,
+    selectedAnswers,
+    score,
+    elapsedTime: getCurrentElapsedTime(),
+  };
+
+  localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessionData));
+}
+
+function loadSession() {
+  const savedSession = localStorage.getItem(SESSION_STORAGE_KEY);
+
+  if (!savedSession) {
+    return null;
+  }
+
+  try {
+    const sessionData = JSON.parse(savedSession);
+
+    if (
+      typeof sessionData.playerName !== "string" ||
+      typeof sessionData.questionNumber !== "number" ||
+      !Array.isArray(sessionData.selectedAnswers) ||
+      typeof sessionData.score !== "number" ||
+      typeof sessionData.elapsedTime !== "number"
+    ) {
+      return null;
+    }
+
+    return sessionData;
+  } catch (error) {
+    localStorage.removeItem(SESSION_STORAGE_KEY);
+    return null;
+  }
+}
+
+function clearSession() {
+  localStorage.removeItem(SESSION_STORAGE_KEY);
+}
+
+function getRanking() {
+  const savedRanking = localStorage.getItem(RANKING_STORAGE_KEY);
+
+  if (!savedRanking) {
+    return [];
+  }
+
+  try {
+    const ranking = JSON.parse(savedRanking);
+    return Array.isArray(ranking) ? ranking : [];
+  } catch (error) {
+    localStorage.removeItem(RANKING_STORAGE_KEY);
+    return [];
+  }
+}
+
+function saveRanking(ranking) {
+  localStorage.setItem(RANKING_STORAGE_KEY, JSON.stringify(ranking));
+}
+
+function addRankingEntry() {
+  const ranking = getRanking();
+
+  ranking.push({
+    name: playerName,
+    score,
+    total: questions.length,
+    elapsedTime,
+    date: new Date().toISOString(),
+  });
+
+  ranking.sort(function (first, second) {
+    if (second.score !== first.score) {
+      return second.score - first.score;
+    }
+
+    return first.elapsedTime - second.elapsedTime;
+  });
+
+  saveRanking(ranking);
+  renderRanking(ranking);
+}
+
+function renderRanking(ranking = getRanking()) {
+  rankingList.innerHTML = "";
+
+  if (ranking.length === 0) {
+    const emptyItem = document.createElement("li");
+    emptyItem.textContent = "Nenhuma pontuação registrada ainda.";
+    rankingList.appendChild(emptyItem);
+    return;
+  }
+
+  for (let i = 0; i < ranking.length; i++) {
+    const item = document.createElement("li");
+    item.textContent =
+      ranking[i].name + " - " + ranking[i].score + "/" + ranking[i].total + " - " + formatTime(ranking[i].elapsedTime);
+    rankingList.appendChild(item);
+  }
+}
+
+function restoreSession(sessionData) {
+  playerName = sessionData.playerName.trim();
+  questionNumber = Math.min(Math.max(sessionData.questionNumber, 0), questions.length - 1);
+  selectedAnswers = sessionData.selectedAnswers.slice(0, questions.length);
+  score = sessionData.score;
+  elapsedTime = sessionData.elapsedTime;
+  currentPlayerName.textContent = playerName;
+  showScreen(quizScreen);
+  startTimer();
+  showQuestion();
+
+  if (selectedAnswers[questionNumber] !== undefined) {
+    nextQuestionTimeout = setTimeout(nextQuestion, 850);
+  }
+}
+
 function startQuiz() {
+  if (nextQuestionTimeout !== null) {
+    clearTimeout(nextQuestionTimeout);
+    nextQuestionTimeout = null;
+  }
+
   questionNumber = 0;
   score = 0;
+  selectedAnswers = [];
+  elapsedTime = 0;
+  currentPlayerName.textContent = playerName;
   showScreen(quizScreen);
+  startTimer();
   showQuestion();
+  saveSession();
 }
 
 function showQuestion() {
-  canAnswer = true;
+  canAnswer = selectedAnswers[questionNumber] === undefined;
 
   const question = questions[questionNumber];
   questionCounter.textContent = "Pergunta " + (questionNumber + 1) + " de " + questions.length;
   questionTitle.textContent = question.title;
-  progressFill.style.width = (questionNumber / questions.length) * 100 + "%";
+  const questionWasAnswered = selectedAnswers[questionNumber] !== undefined;
+  progressFill.style.width = ((questionWasAnswered ? questionNumber + 1 : questionNumber) / questions.length) * 100 + "%";
+  updateTimerText();
 
   answersDiv.innerHTML = "";
 
@@ -76,6 +270,15 @@ function showQuestion() {
       checkAnswer(button, i);
     };
 
+    if (selectedAnswers[questionNumber] !== undefined) {
+      button.disabled = true;
+      if (i === question.correct) {
+        button.classList.add("correct");
+      } else if (i === selectedAnswers[questionNumber]) {
+        button.classList.add("wrong");
+      }
+    }
+
     answersDiv.appendChild(button);
   }
 }
@@ -86,6 +289,7 @@ function checkAnswer(selectedButton, answerNumber) {
   }
 
   canAnswer = false;
+  selectedAnswers[questionNumber] = answerNumber;
 
   const question = questions[questionNumber];
   const isCorrect = answerNumber === question.correct;
@@ -100,14 +304,21 @@ function checkAnswer(selectedButton, answerNumber) {
   const buttons = document.querySelectorAll(".answer-button");
   for (let i = 0; i < buttons.length; i++) {
     buttons[i].disabled = true;
+
+    if (i === question.correct) {
+      buttons[i].classList.add("correct");
+    }
   }
 
   progressFill.style.width = ((questionNumber + 1) / questions.length) * 100 + "%";
+  saveSession();
 
-  setTimeout(nextQuestion, 850);
+  nextQuestionTimeout = setTimeout(nextQuestion, 850);
 }
 
 function nextQuestion() {
+  nextQuestionTimeout = null;
+
   if (questionNumber === questions.length - 1) {
     finishQuiz();
     return;
@@ -120,6 +331,7 @@ function nextQuestion() {
     questionBox.classList.remove("leaving");
     questionBox.classList.add("entering");
     showQuestion();
+    saveSession();
 
     setTimeout(function () {
       questionBox.classList.remove("entering");
@@ -128,9 +340,41 @@ function nextQuestion() {
 }
 
 function finishQuiz() {
+  stopTimer();
   scoreText.textContent = score + "/" + questions.length;
+  finalTimeText.textContent = "Tempo: " + formatTime(elapsedTime);
+  addRankingEntry();
+  clearSession();
   showScreen(resultScreen);
 }
 
+loginForm.onsubmit = function (event) {
+  event.preventDefault();
+  const typedName = playerNameInput.value.trim();
+
+  if (!typedName) {
+    playerNameInput.focus();
+    return;
+  }
+
+  playerName = typedName;
+  currentPlayerName.textContent = playerName;
+  showScreen(homeScreen);
+};
+
 startButton.onclick = startQuiz;
-restartButton.onclick = startQuiz;
+restartButton.onclick = function () {
+  clearSession();
+  showScreen(loginScreen);
+  playerNameInput.value = "";
+  playerNameInput.focus();
+};
+
+window.addEventListener("beforeunload", saveSession);
+
+const savedSession = loadSession();
+if (savedSession) {
+  restoreSession(savedSession);
+} else {
+  showScreen(loginScreen);
+}
