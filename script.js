@@ -2,124 +2,135 @@ const questions = [
   {
     title: "Em que ano o Barcelona foi fundado?",
     answers: ["1899", "1905", "1912", "1888"],
-    correctIndex: 0,
+    correct: 0,
   },
   {
     title: "Contra qual rival acontece o clássico chamado “El Clásico”?",
     answers: ["Atlético de Madrid", "Sevilla FC", "Real Madrid CF", "Valencia CF"],
-    correctIndex: 2,
+    correct: 2,
   },
   {
     title: "Qual jogador brasileiro ganhou a Champions League pelo Barça em 2006 e 2015?",
     answers: ["Neymar", "Ronaldinho", "Rivaldo", "Dani Alves"],
-    correctIndex: 3,
+    correct: 3,
   },
   {
     title: "Qual lema famoso do clube significa “mais que um clube”?",
     answers: ["Visca Barça", "Més que un club", "Força Catalunya", "Blaugrana Forever"],
-    correctIndex: 1,
+    correct: 1,
   },
   {
     title: "Quem é conhecido como um dos maiores treinadores da história do Barça e criou o “tiki-taka”?",
     answers: ["Johan Cruyff", "Diego Simeone", "Carlo Ancelotti", "Jurgen Klopp"],
-    correctIndex: 0,
+    correct: 0,
   },
 ];
 
-const homeScreen = document.querySelector("#home");
-const quizScreen = document.querySelector("#quiz");
-const resultScreen = document.querySelector("#result");
-const startButton = document.querySelector("#startButton");
-const restartButton = document.querySelector("#restartButton");
-const questionCard = document.querySelector("#questionCard");
-const questionCounter = document.querySelector("#questionCounter");
-const questionTitle = document.querySelector("#questionTitle");
-const answersContainer = document.querySelector("#answers");
-const progressFill = document.querySelector("#progressFill");
-const scoreText = document.querySelector("#scoreText");
+const homeScreen = document.getElementById("home");
+const quizScreen = document.getElementById("quiz");
+const resultScreen = document.getElementById("result");
 
-let currentQuestion = 0;
+const startButton = document.getElementById("startButton");
+const restartButton = document.getElementById("restartButton");
+const questionBox = document.getElementById("questionBox");
+const questionCounter = document.getElementById("questionCounter");
+const questionTitle = document.getElementById("questionTitle");
+const answersDiv = document.getElementById("answers");
+const progressFill = document.getElementById("progressFill");
+const scoreText = document.getElementById("scoreText");
+
+let questionNumber = 0;
 let score = 0;
-let locked = false;
+let canAnswer = true;
 
 function showScreen(screen) {
-  [homeScreen, quizScreen, resultScreen].forEach((item) => {
-    item.classList.toggle("is-active", item === screen);
-  });
+  homeScreen.classList.remove("active");
+  quizScreen.classList.remove("active");
+  resultScreen.classList.remove("active");
+  screen.classList.add("active");
 }
 
 function startQuiz() {
-  currentQuestion = 0;
+  questionNumber = 0;
   score = 0;
   showScreen(quizScreen);
-  renderQuestion();
+  showQuestion();
 }
 
-function renderQuestion({ entering = false } = {}) {
-  locked = false;
-  const question = questions[currentQuestion];
+function showQuestion() {
+  canAnswer = true;
 
-  questionCounter.textContent = `Pergunta ${currentQuestion + 1} de ${questions.length}`;
+  const question = questions[questionNumber];
+  questionCounter.textContent = "Pergunta " + (questionNumber + 1) + " de " + questions.length;
   questionTitle.textContent = question.title;
-  progressFill.style.width = `${(currentQuestion / questions.length) * 100}%`;
+  progressFill.style.width = (questionNumber / questions.length) * 100 + "%";
 
-  answersContainer.innerHTML = "";
-  question.answers.forEach((answer, index) => {
+  answersDiv.innerHTML = "";
+
+  for (let i = 0; i < question.answers.length; i++) {
     const button = document.createElement("button");
-    button.className = "answer";
     button.type = "button";
-    button.textContent = answer;
-    button.addEventListener("click", () => selectAnswer(button, index));
-    answersContainer.append(button);
-  });
+    button.className = "answer-button";
+    button.textContent = question.answers[i];
+    button.onclick = function () {
+      checkAnswer(button, i);
+    };
 
-  if (entering) {
-    questionCard.classList.remove("is-leaving");
-    questionCard.classList.add("is-entering");
-    questionCard.addEventListener("animationend", () => questionCard.classList.remove("is-entering"), { once: true });
+    answersDiv.appendChild(button);
   }
 }
 
-function selectAnswer(selectedButton, selectedIndex) {
-  if (locked) return;
-  locked = true;
+function checkAnswer(selectedButton, answerNumber) {
+  if (!canAnswer) {
+    return;
+  }
 
-  const question = questions[currentQuestion];
-  const isCorrect = selectedIndex === question.correctIndex;
-  if (isCorrect) score += 1;
+  canAnswer = false;
 
-  [...answersContainer.children].forEach((button, index) => {
-    button.disabled = true;
-    if (index === selectedIndex) {
-      button.classList.add(isCorrect ? "is-correct" : "is-wrong");
-    }
-  });
+  const question = questions[questionNumber];
+  const isCorrect = answerNumber === question.correct;
 
-  progressFill.style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+  if (isCorrect) {
+    score++;
+    selectedButton.classList.add("correct");
+  } else {
+    selectedButton.classList.add("wrong");
+  }
 
-  window.setTimeout(() => {
-    if (currentQuestion === questions.length - 1) {
-      finishQuiz();
-      return;
-    }
+  const buttons = document.querySelectorAll(".answer-button");
+  for (let i = 0; i < buttons.length; i++) {
+    buttons[i].disabled = true;
+  }
 
-    questionCard.classList.remove("is-entering");
-    questionCard.classList.add("is-leaving");
-    questionCard.addEventListener(
-      "animationend",
-      () => {
-        currentQuestion += 1;
-        renderQuestion({ entering: true });
-      },
-      { once: true },
-    );
-  }, 850);
+  progressFill.style.width = ((questionNumber + 1) / questions.length) * 100 + "%";
+
+  setTimeout(nextQuestion, 850);
+}
+
+function nextQuestion() {
+  if (questionNumber === questions.length - 1) {
+    finishQuiz();
+    return;
+  }
+
+  questionBox.classList.add("leaving");
+
+  setTimeout(function () {
+    questionNumber++;
+    questionBox.classList.remove("leaving");
+    questionBox.classList.add("entering");
+    showQuestion();
+
+    setTimeout(function () {
+      questionBox.classList.remove("entering");
+    }, 550);
+  }, 450);
 }
 
 function finishQuiz() {
-  scoreText.textContent = `${score}/${questions.length}`;
+  scoreText.textContent = score + "/" + questions.length;
   showScreen(resultScreen);
 }
 
-startButton.addEventListener("click", startQuiz);
-restartButton.addEventListener("click", startQuiz);
+startButton.onclick = startQuiz;
+restartButton.onclick = startQuiz;
