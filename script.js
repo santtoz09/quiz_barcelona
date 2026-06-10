@@ -1,53 +1,10 @@
 const questions = [
-  {
-    title: "Em que ano o Barcelona foi fundado?",
-    answers: ["1899", "1905", "1912", "1888"],
-    correct: 0,
-  },
-  {
-    title: "Contra qual rival acontece o clássico chamado “El Clásico”?",
-    answers: ["Atlético de Madrid", "Sevilla FC", "Real Madrid CF", "Valencia CF"],
-    correct: 2,
-  },
-  {
-    title: "Qual jogador brasileiro ganhou a Champions League pelo Barça em 2006 e 2015?",
-    answers: ["Neymar", "Ronaldinho", "Rivaldo", "Dani Alves"],
-    correct: 3,
-  },
-  {
-    title: "Qual lema famoso do clube significa “mais que um clube”?",
-    answers: ["Visca Barça", "Més que un club", "Força Catalunya", "Blaugrana Forever"],
-    correct: 1,
-  },
-  {
-    title: "Quem é conhecido como um dos maiores treinadores da história do Barça e criou o “tiki-taka”?",
-    answers: ["Johan Cruyff", "Diego Simeone", "Carlo Ancelotti", "Jurgen Klopp"],
-    correct: 0,
-  },
+  { title: "Em que ano o Barcelona foi fundado?", answers: ["1899", "1905", "1912", "1888"], correct: 0 },
+  { title: "Contra qual rival acontece o clássico chamado \"El Clásico\"?", answers: ["Atlético de Madrid", "Sevilla FC", "Real Madrid CF", "Valencia CF"], correct: 2 },
+  { title: "Qual jogador brasileiro ganhou a Champions League pelo Barça em 2006 e 2015?", answers: ["Neymar", "Ronaldinho", "Rivaldo", "Dani Alves"], correct: 3 },
+  { title: "Qual lema famoso do clube significa \"mais que um clube\"?", answers: ["Visca Barça", "Més que un club", "Força Catalunya", "Blaugrana Forever"], correct: 1 },
+  { title: "Quem é conhecido como um dos maiores treinadores da história do Barça e criou o \"tiki-taka\"?", answers: ["Johan Cruyff", "Diego Simeone", "Carlo Ancelotti", "Jurgen Klopp"], correct: 0 }
 ];
-
-const SESSION_STORAGE_KEY = "barcelonaQuizSession";
-const RANKING_STORAGE_KEY = "barcelonaQuizRanking";
-
-const loginScreen = document.getElementById("login");
-const homeScreen = document.getElementById("home");
-const quizScreen = document.getElementById("quiz");
-const resultScreen = document.getElementById("result");
-
-const loginForm = document.getElementById("loginForm");
-const playerNameInput = document.getElementById("playerName");
-const currentPlayerName = document.getElementById("currentPlayerName");
-const startButton = document.getElementById("startButton");
-const restartButton = document.getElementById("restartButton");
-const questionBox = document.getElementById("questionBox");
-const questionCounter = document.getElementById("questionCounter");
-const questionTitle = document.getElementById("questionTitle");
-const answersDiv = document.getElementById("answers");
-const progressFill = document.getElementById("progressFill");
-const scoreText = document.getElementById("scoreText");
-const timerText = document.getElementById("timerText");
-const finalTimeText = document.getElementById("finalTimeText");
-const rankingList = document.getElementById("rankingList");
 
 let playerName = "";
 let questionNumber = 0;
@@ -59,31 +16,41 @@ let timerStartedAt = null;
 let timerInterval = null;
 let nextQuestionTimeout = null;
 
-function showScreen(screen) {
-  loginScreen.classList.remove("active");
-  homeScreen.classList.remove("active");
-  quizScreen.classList.remove("active");
-  resultScreen.classList.remove("active");
-  screen.classList.add("active");
-}
+const el = {
+  login: document.getElementById("login"),
+  home: document.getElementById("home"),
+  quiz: document.getElementById("quiz"),
+  result: document.getElementById("result"),
+  loginForm: document.getElementById("loginForm"),
+  playerNameInput: document.getElementById("playerName"),
+  currentPlayerName: document.getElementById("currentPlayerName"),
+  startButton: document.getElementById("startButton"),
+  restartButton: document.getElementById("restartButton"),
+  questionBox: document.getElementById("questionBox"),
+  questionCounter: document.getElementById("questionCounter"),
+  questionTitle: document.getElementById("questionTitle"),
+  answersDiv: document.getElementById("answers"),
+  progressFill: document.getElementById("progressFill"),
+  scoreText: document.getElementById("scoreText"),
+  timerText: document.getElementById("timerText"),
+  finalTimeText: document.getElementById("finalTimeText"),
+  rankingList: document.getElementById("rankingList")
+};
 
-function formatTime(milliseconds) {
-  const totalSeconds = Math.floor(milliseconds / 1000);
+function formatTime(ms) {
+  const totalSeconds = Math.floor(ms / 1000);
   const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
   const seconds = String(totalSeconds % 60).padStart(2, "0");
   return minutes + ":" + seconds;
 }
 
 function getCurrentElapsedTime() {
-  if (timerStartedAt === null) {
-    return elapsedTime;
-  }
-
+  if (timerStartedAt === null) return elapsedTime;
   return elapsedTime + Date.now() - timerStartedAt;
 }
 
 function updateTimerText() {
-  timerText.textContent = "Tempo: " + formatTime(getCurrentElapsedTime());
+  el.timerText.textContent = "Tempo: " + formatTime(getCurrentElapsedTime());
 }
 
 function startTimer() {
@@ -97,11 +64,8 @@ function startTimer() {
 }
 
 function stopTimer() {
-  if (timerInterval !== null) {
-    clearInterval(timerInterval);
-    timerInterval = null;
-  }
-
+  if (timerInterval !== null) clearInterval(timerInterval);
+  timerInterval = null;
   if (timerStartedAt !== null) {
     elapsedTime += Date.now() - timerStartedAt;
     timerStartedAt = null;
@@ -109,111 +73,177 @@ function stopTimer() {
 }
 
 function saveSession() {
-  if (!playerName || !quizScreen.classList.contains("active")) {
-    return;
-  }
-
-  const sessionData = {
-    playerName,
-    questionNumber,
-    selectedAnswers,
-    score,
-    elapsedTime: getCurrentElapsedTime(),
-  };
-
-  localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(sessionData));
+  if (!playerName || !el.quiz.classList.contains("active")) return;
+  const data = { playerName, questionNumber, selectedAnswers, score, elapsedTime: getCurrentElapsedTime() };
+  localStorage.setItem("session", JSON.stringify(data));
 }
 
 function loadSession() {
-  const savedSession = localStorage.getItem(SESSION_STORAGE_KEY);
-
-  if (!savedSession) {
-    return null;
-  }
-
+  const saved = localStorage.getItem("session");
+  if (!saved) return null;
   try {
-    const sessionData = JSON.parse(savedSession);
-
-    if (
-      typeof sessionData.playerName !== "string" ||
-      typeof sessionData.questionNumber !== "number" ||
-      !Array.isArray(sessionData.selectedAnswers) ||
-      typeof sessionData.score !== "number" ||
-      typeof sessionData.elapsedTime !== "number"
-    ) {
-      return null;
-    }
-
-    return sessionData;
-  } catch (error) {
-    localStorage.removeItem(SESSION_STORAGE_KEY);
+    return JSON.parse(saved);
+  } catch (e) {
     return null;
   }
-}
-
-function clearSession() {
-  localStorage.removeItem(SESSION_STORAGE_KEY);
 }
 
 function getRanking() {
-  const savedRanking = localStorage.getItem(RANKING_STORAGE_KEY);
-
-  if (!savedRanking) {
-    return [];
-  }
-
+  const saved = localStorage.getItem("ranking");
+  if (!saved) return [];
   try {
-    const ranking = JSON.parse(savedRanking);
-    return Array.isArray(ranking) ? ranking : [];
-  } catch (error) {
-    localStorage.removeItem(RANKING_STORAGE_KEY);
+    return JSON.parse(saved);
+  } catch (e) {
     return [];
   }
 }
 
 function saveRanking(ranking) {
-  localStorage.setItem(RANKING_STORAGE_KEY, JSON.stringify(ranking));
+  localStorage.setItem("ranking", JSON.stringify(ranking));
 }
 
-function addRankingEntry() {
+function renderRanking() {
   const ranking = getRanking();
-
-  ranking.push({
-    name: playerName,
-    score,
-    total: questions.length,
-    elapsedTime,
-    date: new Date().toISOString(),
-  });
-
-  ranking.sort(function (first, second) {
-    if (second.score !== first.score) {
-      return second.score - first.score;
-    }
-
-    return first.elapsedTime - second.elapsedTime;
-  });
-
-  saveRanking(ranking);
-  renderRanking(ranking);
-}
-
-function renderRanking(ranking = getRanking()) {
-  rankingList.innerHTML = "";
-
+  el.rankingList.innerHTML = "";
+  
   if (ranking.length === 0) {
-    const emptyItem = document.createElement("li");
-    emptyItem.textContent = "Nenhuma pontuação registrada ainda.";
-    rankingList.appendChild(emptyItem);
+    el.rankingList.innerHTML = "<li>Nenhuma pontuação registrada ainda.</li>";
     return;
   }
+  
+  ranking.forEach(function(r) {
+    const li = document.createElement("li");
+    li.textContent = r.name + " - " + r.score + "/" + r.total + " - " + formatTime(r.elapsedTime);
+    el.rankingList.appendChild(li);
+  });
+}
 
-  for (let i = 0; i < ranking.length; i++) {
-    const item = document.createElement("li");
-    item.textContent =
-      ranking[i].name + " - " + ranking[i].score + "/" + ranking[i].total + " - " + formatTime(ranking[i].elapsedTime);
-    rankingList.appendChild(item);
+function showScreen(screen) {
+  el.login.classList.remove("active");
+  el.home.classList.remove("active");
+  el.quiz.classList.remove("active");
+  el.result.classList.remove("active");
+  screen.classList.add("active");
+}
+
+function showQuestion() {
+  canAnswer = selectedAnswers[questionNumber] === undefined;
+  const question = questions[questionNumber];
+  const answered = selectedAnswers[questionNumber] !== undefined;
+  
+  el.questionCounter.textContent = "Pergunta " + (questionNumber + 1) + " de " + questions.length;
+  el.questionTitle.textContent = question.title;
+  el.progressFill.style.width = ((answered ? questionNumber + 1 : questionNumber) / questions.length) * 100 + "%";
+  updateTimerText();
+  
+  el.answersDiv.innerHTML = "";
+  
+  for (let i = 0; i < question.answers.length; i++) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "answer-button";
+    btn.textContent = question.answers[i];
+    btn.disabled = answered;
+    
+    if (answered) {
+      if (i === question.correct) btn.classList.add("correct");
+      if (i === selectedAnswers[questionNumber]) btn.classList.add("wrong");
+    }
+    
+    btn.onclick = function() {
+      checkAnswer(btn, i);
+    };
+    
+    el.answersDiv.appendChild(btn);
   }
+}
+
+function checkAnswer(btn, answerNumber) {
+  if (!canAnswer) return;
+  
+  canAnswer = false;
+  selectedAnswers[questionNumber] = answerNumber;
+  const question = questions[questionNumber];
+  const isCorrect = answerNumber === question.correct;
+  
+  if (isCorrect) score++;
+  
+  btn.classList.add(isCorrect ? "correct" : "wrong");
+  
+  const allBtns = document.querySelectorAll(".answer-button");
+  for (let i = 0; i < allBtns.length; i++) {
+    allBtns[i].disabled = true;
+    if (i === question.correct) allBtns[i].classList.add("correct");
+  }
+  
+  el.progressFill.style.width = ((questionNumber + 1) / questions.length) * 100 + "%";
+  saveSession();
+  
+  nextQuestionTimeout = setTimeout(nextQuestion, 850);
+}
+
+function nextQuestion() {
+  nextQuestionTimeout = null;
+  
+  if (questionNumber === questions.length - 1) {
+    finishQuiz();
+    return;
+  }
+  
+  el.questionBox.classList.add("leaving");
+  
+  setTimeout(function() {
+    questionNumber++;
+    el.questionBox.classList.remove("leaving");
+    el.questionBox.classList.add("entering");
+    showQuestion();
+    saveSession();
+    
+    setTimeout(function() {
+      el.questionBox.classList.remove("entering");
+    }, 550);
+  }, 450);
+}
+
+function finishQuiz() {
+  stopTimer();
+  el.scoreText.textContent = score + "/" + questions.length;
+  el.finalTimeText.textContent = "Tempo: " + formatTime(elapsedTime);
+  
+  const ranking = getRanking();
+  ranking.push({
+    name: playerName,
+    score: score,
+    total: questions.length,
+    elapsedTime: elapsedTime,
+    date: new Date().toISOString()
+  });
+  
+  ranking.sort(function(a, b) {
+    if (a.score !== b.score) return b.score - a.score;
+    return a.elapsedTime - b.elapsedTime;
+  });
+  
+  saveRanking(ranking);
+  renderRanking();
+  localStorage.removeItem("session");
+  showScreen(el.result);
+}
+
+function startQuiz() {
+  if (nextQuestionTimeout !== null) clearTimeout(nextQuestionTimeout);
+  nextQuestionTimeout = null;
+  
+  questionNumber = 0;
+  score = 0;
+  selectedAnswers = [];
+  elapsedTime = 0;
+  
+  el.currentPlayerName.textContent = playerName;
+  showScreen(el.quiz);
+  startTimer();
+  showQuestion();
+  saveSession();
 }
 
 function restoreSession(sessionData) {
@@ -222,159 +252,45 @@ function restoreSession(sessionData) {
   selectedAnswers = sessionData.selectedAnswers.slice(0, questions.length);
   score = sessionData.score;
   elapsedTime = sessionData.elapsedTime;
-  currentPlayerName.textContent = playerName;
-  showScreen(quizScreen);
+  
+  el.currentPlayerName.textContent = playerName;
+  showScreen(el.quiz);
   startTimer();
   showQuestion();
-
+  
   if (selectedAnswers[questionNumber] !== undefined) {
     nextQuestionTimeout = setTimeout(nextQuestion, 850);
   }
 }
 
-function startQuiz() {
-  if (nextQuestionTimeout !== null) {
-    clearTimeout(nextQuestionTimeout);
-    nextQuestionTimeout = null;
-  }
-
-  questionNumber = 0;
-  score = 0;
-  selectedAnswers = [];
-  elapsedTime = 0;
-  currentPlayerName.textContent = playerName;
-  showScreen(quizScreen);
-  startTimer();
-  showQuestion();
-  saveSession();
-}
-
-function showQuestion() {
-  canAnswer = selectedAnswers[questionNumber] === undefined;
-
-  const question = questions[questionNumber];
-  questionCounter.textContent = "Pergunta " + (questionNumber + 1) + " de " + questions.length;
-  questionTitle.textContent = question.title;
-  const questionWasAnswered = selectedAnswers[questionNumber] !== undefined;
-  progressFill.style.width = ((questionWasAnswered ? questionNumber + 1 : questionNumber) / questions.length) * 100 + "%";
-  updateTimerText();
-
-  answersDiv.innerHTML = "";
-
-  for (let i = 0; i < question.answers.length; i++) {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "answer-button";
-    button.textContent = question.answers[i];
-    button.onclick = function () {
-      checkAnswer(button, i);
-    };
-
-    if (selectedAnswers[questionNumber] !== undefined) {
-      button.disabled = true;
-      if (i === question.correct) {
-        button.classList.add("correct");
-      } else if (i === selectedAnswers[questionNumber]) {
-        button.classList.add("wrong");
-      }
-    }
-
-    answersDiv.appendChild(button);
-  }
-}
-
-function checkAnswer(selectedButton, answerNumber) {
-  if (!canAnswer) {
+// Event Listeners
+el.loginForm.onsubmit = function(e) {
+  e.preventDefault();
+  const name = el.playerNameInput.value.trim();
+  if (!name) {
+    el.playerNameInput.focus();
     return;
   }
-
-  canAnswer = false;
-  selectedAnswers[questionNumber] = answerNumber;
-
-  const question = questions[questionNumber];
-  const isCorrect = answerNumber === question.correct;
-
-  if (isCorrect) {
-    score++;
-    selectedButton.classList.add("correct");
-  } else {
-    selectedButton.classList.add("wrong");
-  }
-
-  const buttons = document.querySelectorAll(".answer-button");
-  for (let i = 0; i < buttons.length; i++) {
-    buttons[i].disabled = true;
-
-    if (i === question.correct) {
-      buttons[i].classList.add("correct");
-    }
-  }
-
-  progressFill.style.width = ((questionNumber + 1) / questions.length) * 100 + "%";
-  saveSession();
-
-  nextQuestionTimeout = setTimeout(nextQuestion, 850);
-}
-
-function nextQuestion() {
-  nextQuestionTimeout = null;
-
-  if (questionNumber === questions.length - 1) {
-    finishQuiz();
-    return;
-  }
-
-  questionBox.classList.add("leaving");
-
-  setTimeout(function () {
-    questionNumber++;
-    questionBox.classList.remove("leaving");
-    questionBox.classList.add("entering");
-    showQuestion();
-    saveSession();
-
-    setTimeout(function () {
-      questionBox.classList.remove("entering");
-    }, 550);
-  }, 450);
-}
-
-function finishQuiz() {
-  stopTimer();
-  scoreText.textContent = score + "/" + questions.length;
-  finalTimeText.textContent = "Tempo: " + formatTime(elapsedTime);
-  addRankingEntry();
-  clearSession();
-  showScreen(resultScreen);
-}
-
-loginForm.onsubmit = function (event) {
-  event.preventDefault();
-  const typedName = playerNameInput.value.trim();
-
-  if (!typedName) {
-    playerNameInput.focus();
-    return;
-  }
-
-  playerName = typedName;
-  currentPlayerName.textContent = playerName;
-  showScreen(homeScreen);
+  playerName = name;
+  el.currentPlayerName.textContent = playerName;
+  showScreen(el.home);
 };
 
-startButton.onclick = startQuiz;
-restartButton.onclick = function () {
-  clearSession();
-  showScreen(loginScreen);
-  playerNameInput.value = "";
-  playerNameInput.focus();
+el.startButton.onclick = startQuiz;
+
+el.restartButton.onclick = function() {
+  localStorage.removeItem("session");
+  showScreen(el.login);
+  el.playerNameInput.value = "";
+  el.playerNameInput.focus();
 };
 
 window.addEventListener("beforeunload", saveSession);
 
-const savedSession = loadSession();
-if (savedSession) {
-  restoreSession(savedSession);
+// Inicialização
+const saved = loadSession();
+if (saved) {
+  restoreSession(saved);
 } else {
-  showScreen(loginScreen);
+  showScreen(el.login);
 }
