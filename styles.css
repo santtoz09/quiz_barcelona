@@ -26,24 +26,24 @@ button {
   overflow: hidden;
 }
 
-.screen {
+.tela {
   display: none;
   position: absolute;
   inset: 0;
   padding: 70px 90px;
 }
 
-.screen.active {
+.tela.ativa {
   display: flex;
 }
 
-#login,
-#home,
-#result {
-  animation: fade 0.45s ease;
+#tela-login,
+#tela-inicio,
+#tela-resultado {
+  animation: desaparecer 0.45s ease;
 }
 
-.login-card {
+.cartao-login {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -58,7 +58,7 @@ button {
   text-align: center;
 }
 
-.login-card h1 {
+.cartao-login h1 {
   margin: 0;
   color: #ffd100;
   font-size: clamp(42px, 7vw, 78px);
@@ -66,20 +66,20 @@ button {
   text-shadow: 5px 5px 0 rgba(0, 0, 0, 0.3);
 }
 
-.login-form {
+.form-login {
   display: flex;
   flex-direction: column;
   gap: 14px;
   width: 100%;
 }
 
-.login-form label {
+.form-login label {
   font-size: 28px;
   letter-spacing: 2px;
   text-transform: uppercase;
 }
 
-.login-form input {
+.form-login input {
   width: 100%;
   border: 0;
   border-radius: 16px;
@@ -90,30 +90,30 @@ button {
   text-transform: uppercase;
 }
 
-.shield-login {
+.escudo-login {
   width: 180px;
 }
 
-.login-button {
+.botao-login {
   position: static;
   align-self: center;
   margin-top: 12px;
 }
 
-.home-text {
+.texto-inicio {
   position: absolute;
   top: 21vh;
   left: 14vw;
   line-height: 0.75;
 }
 
-.home-text h1 {
+.texto-inicio h1 {
   margin: 0;
   font-size: 15vw;
   letter-spacing: -10px;
 }
 
-.home-text p {
+.texto-inicio p {
   position: relative;
   top: -20px;
   margin: 0;
@@ -125,21 +125,21 @@ button {
   text-align: center;
 }
 
-.shield {
+.escudo {
   width: 310px;
   height: auto;
   filter: drop-shadow(0 16px 14px rgba(0, 0, 0, 0.42));
   user-select: none;
 }
 
-.shield-home {
+.escudo-inicio {
   position: absolute;
   top: 31vh;
   left: 58vw;
   transform: translate(-50%, -50%);
 }
 
-.main-button {
+.botao-principal {
   position: absolute;
   left: 16vw;
   bottom: 13vh;
@@ -154,7 +154,7 @@ button {
   text-transform: uppercase;
 }
 
-.player-banner {
+.faixa-jogador {
   position: absolute;
   left: 16vw;
   bottom: 25vh;
@@ -166,40 +166,40 @@ button {
   text-transform: uppercase;
 }
 
-.main-button:hover {
+.botao-principal:hover {
   transform: translateY(-4px);
 }
 
-#quiz {
+#tela-quiz {
   align-items: center;
 }
 
-.question-box {
+.caixa-pergunta {
   display: flex;
   align-items: center;
   gap: 120px;
   width: 100%;
 }
 
-.question-area {
+.area-pergunta {
   width: 48%;
   min-width: 440px;
 }
 
-.quiz-meta {
+.info-quiz {
   display: flex;
   justify-content: space-between;
   gap: 20px;
 }
 
-.counter {
+.contador {
   margin: 0 0 12px;
   color: rgba(255, 255, 255, 0.75);
   font-size: 20px;
   letter-spacing: 4px;
 }
 
-#questionTitle {
+#titulo-pergunta {
   min-height: 210px;
   margin: 0 0 35px;
   font-size: 58px;
@@ -207,13 +207,13 @@ button {
   text-transform: uppercase;
 }
 
-.answers {
+.respostas {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.answer-button {
+.botao-resposta {
   min-height: 76px;
   border: 0;
   border-radius: 14px;
@@ -227,24 +227,24 @@ button {
   transition: transform 0.2s, background 0.2s, color 0.2s;
 }
 
-.answer-button:hover:not(:disabled) {
+.botao-resposta:hover:not(:disabled) {
   transform: translateX(12px);
 }
 
-.answer-button.correct {
+.botao-resposta.correta {
   background: #05c86a;
 }
 
-.answer-button.wrong {
+.botao-resposta.errada {
   color: white;
   background: #ef263d;
 }
 
-.answer-button:disabled {
+.botao-resposta:disabled {
   cursor: default;
 }
 
-.progress-bar {
+.barra-progresso {
   position: absolute;
   left: 90px;
   bottom: 45px;
@@ -253,32 +253,32 @@ button {
   background: white;
 }
 
-#progressFill {
+#preenchimento-progresso {
   width: 0%;
   height: 100%;
   background: #05c86a;
   transition: width 0.5s;
 }
 
-.leaving {
-  animation: leave 0.45s ease forwards;
+.saindo {
+  animation: sair 0.45s ease forwards;
 }
 
-.entering {
-  animation: enter 0.55s ease forwards;
+.entrando {
+  animation: entrar 0.55s ease forwards;
 }
 
-#result {
+#tela-resultado {
   align-items: center;
   gap: 80px;
 }
 
-.result-text {
+.texto-resultado {
   flex: 1;
   text-align: center;
 }
 
-.result-text h2 {
+.texto-resultado h2 {
   margin: 0;
   color: transparent;
   -webkit-text-stroke: 2px white;
@@ -286,12 +286,12 @@ button {
   line-height: 0.85;
 }
 
-.result-text p {
+.texto-resultado p {
   margin: -10px 0 0;
   font-size: 4vw;
 }
 
-.result-text strong {
+.texto-resultado strong {
   display: block;
   color: #05c86a;
   font-size: 10vw;
@@ -299,14 +299,14 @@ button {
   text-shadow: 14px 12px 0 rgba(4, 91, 61, 0.6);
 }
 
-.final-time {
+.tempo-final {
   display: block;
   margin-top: 12px;
   color: #ffd100;
   font-size: 30px;
 }
 
-.ranking-card {
+.cartao-ranking {
   max-width: 560px;
   margin: 24px auto 0;
   padding: 18px 24px;
@@ -314,14 +314,14 @@ button {
   background: rgba(0, 0, 0, 0.35);
 }
 
-.ranking-card h3 {
+.cartao-ranking h3 {
   margin: 0 0 10px;
   color: #ffd100;
   font-size: 38px;
   text-transform: uppercase;
 }
 
-.ranking-list {
+.lista-ranking {
   max-height: 150px;
   margin: 0;
   padding-left: 34px;
@@ -332,24 +332,24 @@ button {
   text-align: left;
 }
 
-.ranking-list li {
+.lista-ranking li {
   margin-bottom: 6px;
 }
 
-.small-button {
+.botao-pequeno {
   position: static;
   margin-top: 28px;
   font-size: 24px;
 }
 
-@keyframes leave {
+@keyframes sair {
   to {
     opacity: 0;
     transform: translateX(-110vw);
   }
 }
 
-@keyframes enter {
+@keyframes entrar {
   from {
     opacity: 0;
     transform: translateX(100vw);
@@ -361,7 +361,7 @@ button {
   }
 }
 
-@keyframes fade {
+@keyframes desaparecer {
   from {
     opacity: 0;
   }
@@ -380,70 +380,70 @@ button {
     min-height: 820px;
   }
 
-  .screen {
+  .tela {
     padding: 35px;
   }
 
-  .home-text {
+  .texto-inicio {
     top: 14vh;
     left: 8vw;
   }
 
-  .home-text h1 {
+  .texto-inicio h1 {
     font-size: 26vw;
   }
 
-  .home-text p {
+  .texto-inicio p {
     font-size: 8vw;
   }
 
-  .shield {
+  .escudo {
     width: 210px;
   }
 
-  .shield-home {
+  .escudo-inicio {
     top: 52%;
     left: 50%;
   }
 
-  .main-button {
+  .botao-principal {
     left: 8vw;
     bottom: 10vh;
     font-size: 26px;
   }
 
-  .question-box,
-  #result {
+  .caixa-pergunta,
+  #tela-resultado {
     flex-direction: column;
     justify-content: center;
     gap: 25px;
   }
 
-  .question-area {
+  .area-pergunta {
     width: 100%;
     min-width: 0;
   }
 
-  #questionTitle {
+  #titulo-pergunta {
     min-height: auto;
     font-size: 34px;
   }
 
-  .answer-button {
+  .botao-resposta {
     font-size: 30px;
   }
 
-  .progress-bar {
+  .barra-progresso {
     left: 35px;
     width: calc(100% - 70px);
   }
 
-  .result-text h2,
-  .result-text strong {
+  .texto-resultado h2,
+  .texto-resultado strong {
     font-size: 18vw;
   }
 
-  .result-text p {
+  .texto-resultado p {
     font-size: 7vw;
   }
 }

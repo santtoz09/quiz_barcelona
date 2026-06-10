@@ -8,63 +8,63 @@
   </head>
   <body>
     <main class="app">
-      <section id="login" class="screen active">
-        <div class="login-card">
-          <img class="shield shield-login" src="barcelona.png" alt="Escudo do Barcelona" />
+      <section id="tela-login" class="tela ativa">
+        <div class="cartao-login">
+          <img class="escudo escudo-login" src="barcelona.png" alt="Escudo do Barcelona" />
           <h1>QUIZ BARCELONA</h1>
-          <form id="loginForm" class="login-form">
-            <label for="playerName">Digite seu nome</label>
-            <input id="playerName" name="playerName" type="text" maxlength="30" autocomplete="name" required />
-            <button class="main-button login-button" type="submit">Entrar</button>
+          <form id="form-login" class="form-login">
+            <label for="nomeJogador">Digite seu nome</label>
+            <input id="nomeJogador" name="nomeJogador" type="text" maxlength="30" autocomplete="name" required />
+            <button class="botao-principal botao-login" type="submit">Entrar</button>
           </form>
         </div>
       </section>
 
-      <section id="home" class="screen">
-        <div class="home-text">
+      <section id="tela-inicio" class="tela">
+        <div class="texto-inicio">
           <h1>QUIZ</h1>
           <p>BARCELONA</p>
         </div>
 
-        <img class="shield shield-home" src="barcelona.png" alt="Escudo do Barcelona" />
-        <div class="player-banner">Jogador: <span id="currentPlayerName"></span></div>
-        <button id="startButton" class="main-button" type="button">Iniciar quiz</button>
+        <img class="escudo escudo-inicio" src="barcelona.png" alt="Escudo do Barcelona" />
+        <div class="faixa-jogador">Jogador: <span id="nomeJogadorAtual"></span></div>
+        <button id="botao-iniciar" class="botao-principal" type="button">Iniciar quiz</button>
       </section>
 
-      <section id="quiz" class="screen">
-        <div id="questionBox" class="question-box">
-          <div class="question-area">
-            <div class="quiz-meta">
-              <p id="questionCounter" class="counter"></p>
-              <p id="timerText" class="counter timer">Tempo: 00:00</p>
+      <section id="tela-quiz" class="tela">
+        <div id="caixa-pergunta" class="caixa-pergunta">
+          <div class="area-pergunta">
+            <div class="info-quiz">
+              <p id="contador-pergunta" class="contador"></p>
+              <p id="texto-tempo" class="contador tempo">Tempo: 00:00</p>
             </div>
-            <h2 id="questionTitle"></h2>
-            <div id="answers" class="answers"></div>
+            <h2 id="titulo-pergunta"></h2>
+            <div id="respostas" class="respostas"></div>
           </div>
 
-          <img class="shield shield-quiz" src="barcelona.png" alt="Escudo do Barcelona" />
+          <img class="escudo escudo-quiz" src="barcelona.png" alt="Escudo do Barcelona" />
         </div>
 
-        <div class="progress-bar">
-          <div id="progressFill"></div>
+        <div class="barra-progresso">
+          <div id="preenchimento-progresso"></div>
         </div>
       </section>
 
-      <section id="result" class="screen">
-        <img class="shield shield-result" src="barcelona.png" alt="Escudo do Barcelona" />
+      <section id="tela-resultado" class="tela">
+        <img class="escudo escudo-resultado" src="barcelona.png" alt="Escudo do Barcelona" />
 
-        <div class="result-text">
+        <div class="texto-resultado">
           <h2>PARABÉNS</h2>
           <p>SUA PONTUAÇÃO FOI:</p>
-          <strong id="scoreText">0/5</strong>
-          <span id="finalTimeText" class="final-time">Tempo: 00:00</span>
+          <strong id="texto-pontuacao">0/5</strong>
+          <span id="texto-tempo-final" class="tempo-final">Tempo: 00:00</span>
 
-          <div class="ranking-card">
+          <div class="cartao-ranking">
             <h3>Ranking</h3>
-            <ol id="rankingList" class="ranking-list"></ol>
+            <ol id="lista-ranking" class="lista-ranking"></ol>
           </div>
 
-          <button id="restartButton" class="main-button small-button" type="button">Jogar novamente</button>
+          <button id="botao-reiniciar" class="botao-principal botao-pequeno" type="button">Jogar novamente</button>
         </div>
       </section>
     </main>

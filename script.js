@@ -1,296 +1,296 @@
-const questions = [
-  { title: "Em que ano o Barcelona foi fundado?", answers: ["1899", "1905", "1912", "1888"], correct: 0 },
-  { title: "Contra qual rival acontece o clássico chamado \"El Clásico\"?", answers: ["Atlético de Madrid", "Sevilla FC", "Real Madrid CF", "Valencia CF"], correct: 2 },
-  { title: "Qual jogador brasileiro ganhou a Champions League pelo Barça em 2006 e 2015?", answers: ["Neymar", "Ronaldinho", "Rivaldo", "Dani Alves"], correct: 3 },
-  { title: "Qual lema famoso do clube significa \"mais que um clube\"?", answers: ["Visca Barça", "Més que un club", "Força Catalunya", "Blaugrana Forever"], correct: 1 },
-  { title: "Quem é conhecido como um dos maiores treinadores da história do Barça e criou o \"tiki-taka\"?", answers: ["Johan Cruyff", "Diego Simeone", "Carlo Ancelotti", "Jurgen Klopp"], correct: 0 }
+const perguntas = [
+  { titulo: "Em que ano o Barcelona foi fundado?", respostas: ["1899", "1905", "1912", "1888"], correta: 0 },
+  { titulo: "Contra qual rival acontece o clássico chamado \"El Clásico\"?", respostas: ["Atlético de Madrid", "Sevilla FC", "Real Madrid CF", "Valencia CF"], correta: 2 },
+  { titulo: "Qual jogador brasileiro ganhou a Champions League pelo Barça em 2006 e 2015?", respostas: ["Neymar", "Ronaldinho", "Rivaldo", "Dani Alves"], correta: 3 },
+  { titulo: "Qual lema famoso do clube significa \"mais que um clube\"?", respostas: ["Visca Barça", "Més que un club", "Força Catalunya", "Blaugrana Forever"], correta: 1 },
+  { titulo: "Quem é conhecido como um dos maiores treinadores da história do Barça e criou o \"tiki-taka\"?", respostas: ["Johan Cruyff", "Diego Simeone", "Carlo Ancelotti", "Jurgen Klopp"], correta: 0 }
 ];
 
-let playerName = "";
-let questionNumber = 0;
-let score = 0;
-let canAnswer = true;
-let selectedAnswers = [];
-let elapsedTime = 0;
-let timerStartedAt = null;
-let timerInterval = null;
-let nextQuestionTimeout = null;
+let nomeJogador = "";
+let numeroPerguntas = 0;
+let pontuacao = 0;
+let podResponder = true;
+let respostasEscolhidas = [];
+let tempoDecorrido = 0;
+let inicioTimer = null;
+let intervaloTimer = null;
+let timeoutProximaPergunta = null;
 
-const el = {
-  login: document.getElementById("login"),
-  home: document.getElementById("home"),
-  quiz: document.getElementById("quiz"),
-  result: document.getElementById("result"),
-  loginForm: document.getElementById("loginForm"),
-  playerNameInput: document.getElementById("playerName"),
-  currentPlayerName: document.getElementById("currentPlayerName"),
-  startButton: document.getElementById("startButton"),
-  restartButton: document.getElementById("restartButton"),
-  questionBox: document.getElementById("questionBox"),
-  questionCounter: document.getElementById("questionCounter"),
-  questionTitle: document.getElementById("questionTitle"),
-  answersDiv: document.getElementById("answers"),
-  progressFill: document.getElementById("progressFill"),
-  scoreText: document.getElementById("scoreText"),
-  timerText: document.getElementById("timerText"),
-  finalTimeText: document.getElementById("finalTimeText"),
-  rankingList: document.getElementById("rankingList")
+const elementos = {
+  telaLogin: document.getElementById("tela-login"),
+  telaInicio: document.getElementById("tela-inicio"),
+  telaQuiz: document.getElementById("tela-quiz"),
+  telaResultado: document.getElementById("tela-resultado"),
+  formLogin: document.getElementById("form-login"),
+  nomeJogadorInput: document.getElementById("nomeJogador"),
+  nomeJogadorAtual: document.getElementById("nomeJogadorAtual"),
+  botaoIniciar: document.getElementById("botao-iniciar"),
+  botaoReiniciar: document.getElementById("botao-reiniciar"),
+  caixaPergunta: document.getElementById("caixa-pergunta"),
+  contadorPergunta: document.getElementById("contador-pergunta"),
+  tituloPergunta: document.getElementById("titulo-pergunta"),
+  respostasDiv: document.getElementById("respostas"),
+  preenchimentoProgresso: document.getElementById("preenchimento-progresso"),
+  textoPontuacao: document.getElementById("texto-pontuacao"),
+  textoTempo: document.getElementById("texto-tempo"),
+  textoTempoFinal: document.getElementById("texto-tempo-final"),
+  listaRanking: document.getElementById("lista-ranking")
 };
 
-function formatTime(ms) {
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-  const seconds = String(totalSeconds % 60).padStart(2, "0");
-  return minutes + ":" + seconds;
+function formatarTempo(ms) {
+  const totalSegundos = Math.floor(ms / 1000);
+  const minutos = String(Math.floor(totalSegundos / 60)).padStart(2, "0");
+  const segundos = String(totalSegundos % 60).padStart(2, "0");
+  return minutos + ":" + segundos;
 }
 
-function getCurrentElapsedTime() {
-  if (timerStartedAt === null) return elapsedTime;
-  return elapsedTime + Date.now() - timerStartedAt;
+function obterTempoDecorrido() {
+  if (inicioTimer === null) return tempoDecorrido;
+  return tempoDecorrido + Date.now() - inicioTimer;
 }
 
-function updateTimerText() {
-  el.timerText.textContent = "Tempo: " + formatTime(getCurrentElapsedTime());
+function atualizarTextoTempo() {
+  elementos.textoTempo.textContent = "Tempo: " + formatarTempo(obterTempoDecorrido());
 }
 
-function startTimer() {
-  stopTimer();
-  timerStartedAt = Date.now();
-  updateTimerText();
-  timerInterval = setInterval(function () {
-    updateTimerText();
-    saveSession();
+function iniciarTimer() {
+  pararTimer();
+  inicioTimer = Date.now();
+  atualizarTextoTempo();
+  intervaloTimer = setInterval(function () {
+    atualizarTextoTempo();
+    salvarSessao();
   }, 1000);
 }
 
-function stopTimer() {
-  if (timerInterval !== null) clearInterval(timerInterval);
-  timerInterval = null;
-  if (timerStartedAt !== null) {
-    elapsedTime += Date.now() - timerStartedAt;
-    timerStartedAt = null;
+function pararTimer() {
+  if (intervaloTimer !== null) clearInterval(intervaloTimer);
+  intervaloTimer = null;
+  if (inicioTimer !== null) {
+    tempoDecorrido += Date.now() - inicioTimer;
+    inicioTimer = null;
   }
 }
 
-function saveSession() {
-  if (!playerName || !el.quiz.classList.contains("active")) return;
-  const data = { playerName, questionNumber, selectedAnswers, score, elapsedTime: getCurrentElapsedTime() };
-  localStorage.setItem("session", JSON.stringify(data));
+function salvarSessao() {
+  if (!nomeJogador || !elementos.telaQuiz.classList.contains("ativa")) return;
+  const dados = { nomeJogador, numeroPerguntas, respostasEscolhidas, pontuacao, tempoDecorrido: obterTempoDecorrido() };
+  localStorage.setItem("sessao", JSON.stringify(dados));
 }
 
-function loadSession() {
-  const saved = localStorage.getItem("session");
-  if (!saved) return null;
+function carregarSessao() {
+  const salvo = localStorage.getItem("sessao");
+  if (!salvo) return null;
   try {
-    return JSON.parse(saved);
+    return JSON.parse(salvo);
   } catch (e) {
     return null;
   }
 }
 
-function getRanking() {
-  const saved = localStorage.getItem("ranking");
-  if (!saved) return [];
+function obterRanking() {
+  const salvo = localStorage.getItem("ranking");
+  if (!salvo) return [];
   try {
-    return JSON.parse(saved);
+    return JSON.parse(salvo);
   } catch (e) {
     return [];
   }
 }
 
-function saveRanking(ranking) {
+function salvarRanking(ranking) {
   localStorage.setItem("ranking", JSON.stringify(ranking));
 }
 
-function renderRanking() {
-  const ranking = getRanking();
-  el.rankingList.innerHTML = "";
+function renderizarRanking() {
+  const ranking = obterRanking();
+  elementos.listaRanking.innerHTML = "";
   
   if (ranking.length === 0) {
-    el.rankingList.innerHTML = "<li>Nenhuma pontuação registrada ainda.</li>";
+    elementos.listaRanking.innerHTML = "<li>Nenhuma pontuação registrada ainda.</li>";
     return;
   }
   
   ranking.forEach(function(r) {
     const li = document.createElement("li");
-    li.textContent = r.name + " - " + r.score + "/" + r.total + " - " + formatTime(r.elapsedTime);
-    el.rankingList.appendChild(li);
+    li.textContent = r.nome + " - " + r.pontuacao + "/" + r.total + " - " + formatarTempo(r.tempoDecorrido);
+    elementos.listaRanking.appendChild(li);
   });
 }
 
-function showScreen(screen) {
-  el.login.classList.remove("active");
-  el.home.classList.remove("active");
-  el.quiz.classList.remove("active");
-  el.result.classList.remove("active");
-  screen.classList.add("active");
+function exibirTela(tela) {
+  elementos.telaLogin.classList.remove("ativa");
+  elementos.telaInicio.classList.remove("ativa");
+  elementos.telaQuiz.classList.remove("ativa");
+  elementos.telaResultado.classList.remove("ativa");
+  tela.classList.add("ativa");
 }
 
-function showQuestion() {
-  canAnswer = selectedAnswers[questionNumber] === undefined;
-  const question = questions[questionNumber];
-  const answered = selectedAnswers[questionNumber] !== undefined;
+function exibirPergunta() {
+  podResponder = respostasEscolhidas[numeroPerguntas] === undefined;
+  const pergunta = perguntas[numeroPerguntas];
+  const respondida = respostasEscolhidas[numeroPerguntas] !== undefined;
   
-  el.questionCounter.textContent = "Pergunta " + (questionNumber + 1) + " de " + questions.length;
-  el.questionTitle.textContent = question.title;
-  el.progressFill.style.width = ((answered ? questionNumber + 1 : questionNumber) / questions.length) * 100 + "%";
-  updateTimerText();
+  elementos.contadorPergunta.textContent = "Pergunta " + (numeroPerguntas + 1) + " de " + perguntas.length;
+  elementos.tituloPergunta.textContent = pergunta.titulo;
+  elementos.preenchimentoProgresso.style.width = ((respondida ? numeroPerguntas + 1 : numeroPerguntas) / perguntas.length) * 100 + "%";
+  atualizarTextoTempo();
   
-  el.answersDiv.innerHTML = "";
+  elementos.respostasDiv.innerHTML = "";
   
-  for (let i = 0; i < question.answers.length; i++) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "answer-button";
-    btn.textContent = question.answers[i];
-    btn.disabled = answered;
+  for (let i = 0; i < pergunta.respostas.length; i++) {
+    const botao = document.createElement("button");
+    botao.type = "button";
+    botao.className = "botao-resposta";
+    botao.textContent = pergunta.respostas[i];
+    botao.disabled = respondida;
     
-    if (answered) {
-      if (i === question.correct) btn.classList.add("correct");
-      if (i === selectedAnswers[questionNumber]) btn.classList.add("wrong");
+    if (respondida) {
+      if (i === pergunta.correta) botao.classList.add("correta");
+      if (i === respostasEscolhidas[numeroPerguntas]) botao.classList.add("errada");
     }
     
-    btn.onclick = function() {
-      checkAnswer(btn, i);
+    botao.onclick = function() {
+      verificarResposta(botao, i);
     };
     
-    el.answersDiv.appendChild(btn);
+    elementos.respostasDiv.appendChild(botao);
   }
 }
 
-function checkAnswer(btn, answerNumber) {
-  if (!canAnswer) return;
+function verificarResposta(botao, numeroResposta) {
+  if (!podResponder) return;
   
-  canAnswer = false;
-  selectedAnswers[questionNumber] = answerNumber;
-  const question = questions[questionNumber];
-  const isCorrect = answerNumber === question.correct;
+  podResponder = false;
+  respostasEscolhidas[numeroPerguntas] = numeroResposta;
+  const pergunta = perguntas[numeroPerguntas];
+  const estaCorreta = numeroResposta === pergunta.correta;
   
-  if (isCorrect) score++;
+  if (estaCorreta) pontuacao++;
   
-  btn.classList.add(isCorrect ? "correct" : "wrong");
+  botao.classList.add(estaCorreta ? "correta" : "errada");
   
-  const allBtns = document.querySelectorAll(".answer-button");
-  for (let i = 0; i < allBtns.length; i++) {
-    allBtns[i].disabled = true;
-    if (i === question.correct) allBtns[i].classList.add("correct");
+  const todosBotoes = document.querySelectorAll(".botao-resposta");
+  for (let i = 0; i < todosBotoes.length; i++) {
+    todosBotoes[i].disabled = true;
+    if (i === pergunta.correta) todosBotoes[i].classList.add("correta");
   }
   
-  el.progressFill.style.width = ((questionNumber + 1) / questions.length) * 100 + "%";
-  saveSession();
+  elementos.preenchimentoProgresso.style.width = ((numeroPerguntas + 1) / perguntas.length) * 100 + "%";
+  salvarSessao();
   
-  nextQuestionTimeout = setTimeout(nextQuestion, 850);
+  timeoutProximaPergunta = setTimeout(proximaPergunta, 850);
 }
 
-function nextQuestion() {
-  nextQuestionTimeout = null;
+function proximaPergunta() {
+  timeoutProximaPergunta = null;
   
-  if (questionNumber === questions.length - 1) {
-    finishQuiz();
+  if (numeroPerguntas === perguntas.length - 1) {
+    finalizarQuiz();
     return;
   }
   
-  el.questionBox.classList.add("leaving");
+  elementos.caixaPergunta.classList.add("saindo");
   
   setTimeout(function() {
-    questionNumber++;
-    el.questionBox.classList.remove("leaving");
-    el.questionBox.classList.add("entering");
-    showQuestion();
-    saveSession();
+    numeroPerguntas++;
+    elementos.caixaPergunta.classList.remove("saindo");
+    elementos.caixaPergunta.classList.add("entrando");
+    exibirPergunta();
+    salvarSessao();
     
     setTimeout(function() {
-      el.questionBox.classList.remove("entering");
+      elementos.caixaPergunta.classList.remove("entrando");
     }, 550);
   }, 450);
 }
 
-function finishQuiz() {
-  stopTimer();
-  el.scoreText.textContent = score + "/" + questions.length;
-  el.finalTimeText.textContent = "Tempo: " + formatTime(elapsedTime);
+function finalizarQuiz() {
+  pararTimer();
+  elementos.textoPontuacao.textContent = pontuacao + "/" + perguntas.length;
+  elementos.textoTempoFinal.textContent = "Tempo: " + formatarTempo(tempoDecorrido);
   
-  const ranking = getRanking();
+  const ranking = obterRanking();
   ranking.push({
-    name: playerName,
-    score: score,
-    total: questions.length,
-    elapsedTime: elapsedTime,
-    date: new Date().toISOString()
+    nome: nomeJogador,
+    pontuacao: pontuacao,
+    total: perguntas.length,
+    tempoDecorrido: tempoDecorrido,
+    data: new Date().toISOString()
   });
   
   ranking.sort(function(a, b) {
-    if (a.score !== b.score) return b.score - a.score;
-    return a.elapsedTime - b.elapsedTime;
+    if (a.pontuacao !== b.pontuacao) return b.pontuacao - a.pontuacao;
+    return a.tempoDecorrido - b.tempoDecorrido;
   });
   
-  saveRanking(ranking);
-  renderRanking();
-  localStorage.removeItem("session");
-  showScreen(el.result);
+  salvarRanking(ranking);
+  renderizarRanking();
+  localStorage.removeItem("sessao");
+  exibirTela(elementos.telaResultado);
 }
 
-function startQuiz() {
-  if (nextQuestionTimeout !== null) clearTimeout(nextQuestionTimeout);
-  nextQuestionTimeout = null;
+function iniciarQuiz() {
+  if (timeoutProximaPergunta !== null) clearTimeout(timeoutProximaPergunta);
+  timeoutProximaPergunta = null;
   
-  questionNumber = 0;
-  score = 0;
-  selectedAnswers = [];
-  elapsedTime = 0;
+  numeroPerguntas = 0;
+  pontuacao = 0;
+  respostasEscolhidas = [];
+  tempoDecorrido = 0;
   
-  el.currentPlayerName.textContent = playerName;
-  showScreen(el.quiz);
-  startTimer();
-  showQuestion();
-  saveSession();
+  elementos.nomeJogadorAtual.textContent = nomeJogador;
+  exibirTela(elementos.telaQuiz);
+  iniciarTimer();
+  exibirPergunta();
+  salvarSessao();
 }
 
-function restoreSession(sessionData) {
-  playerName = sessionData.playerName.trim();
-  questionNumber = Math.min(Math.max(sessionData.questionNumber, 0), questions.length - 1);
-  selectedAnswers = sessionData.selectedAnswers.slice(0, questions.length);
-  score = sessionData.score;
-  elapsedTime = sessionData.elapsedTime;
+function restaurarSessao(dadosSessao) {
+  nomeJogador = dadosSessao.nomeJogador.trim();
+  numeroPerguntas = Math.min(Math.max(dadosSessao.numeroPerguntas, 0), perguntas.length - 1);
+  respostasEscolhidas = dadosSessao.respostasEscolhidas.slice(0, perguntas.length);
+  pontuacao = dadosSessao.pontuacao;
+  tempoDecorrido = dadosSessao.tempoDecorrido;
   
-  el.currentPlayerName.textContent = playerName;
-  showScreen(el.quiz);
-  startTimer();
-  showQuestion();
+  elementos.nomeJogadorAtual.textContent = nomeJogador;
+  exibirTela(elementos.telaQuiz);
+  iniciarTimer();
+  exibirPergunta();
   
-  if (selectedAnswers[questionNumber] !== undefined) {
-    nextQuestionTimeout = setTimeout(nextQuestion, 850);
+  if (respostasEscolhidas[numeroPerguntas] !== undefined) {
+    timeoutProximaPergunta = setTimeout(proximaPergunta, 850);
   }
 }
 
-// Event Listeners
-el.loginForm.onsubmit = function(e) {
+// Listeners de eventos
+elementos.formLogin.onsubmit = function(e) {
   e.preventDefault();
-  const name = el.playerNameInput.value.trim();
-  if (!name) {
-    el.playerNameInput.focus();
+  const nome = elementos.nomeJogadorInput.value.trim();
+  if (!nome) {
+    elementos.nomeJogadorInput.focus();
     return;
   }
-  playerName = name;
-  el.currentPlayerName.textContent = playerName;
-  showScreen(el.home);
+  nomeJogador = nome;
+  elementos.nomeJogadorAtual.textContent = nomeJogador;
+  exibirTela(elementos.telaInicio);
 };
 
-el.startButton.onclick = startQuiz;
+elementos.botaoIniciar.onclick = iniciarQuiz;
 
-el.restartButton.onclick = function() {
-  localStorage.removeItem("session");
-  showScreen(el.login);
-  el.playerNameInput.value = "";
-  el.playerNameInput.focus();
+elementos.botaoReiniciar.onclick = function() {
+  localStorage.removeItem("sessao");
+  exibirTela(elementos.telaLogin);
+  elementos.nomeJogadorInput.value = "";
+  elementos.nomeJogadorInput.focus();
 };
 
-window.addEventListener("beforeunload", saveSession);
+window.addEventListener("beforeunload", salvarSessao);
 
 // Inicialização
-const saved = loadSession();
-if (saved) {
-  restoreSession(saved);
+const sessaoSalva = carregarSessao();
+if (sessaoSalva) {
+  restaurarSessao(sessaoSalva);
 } else {
-  showScreen(el.login);
+  exibirTela(elementos.telaLogin);
 }
