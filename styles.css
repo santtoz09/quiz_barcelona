@@ -47,10 +47,10 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 8px;
   width: min(680px, 88vw);
   margin: auto;
-  padding: 44px;
+  padding: 34px 44px;
   border: 4px solid rgba(255, 255, 255, 0.85);
   border-radius: 34px;
   background: rgba(91, 0, 25, 0.78);
@@ -61,7 +61,7 @@ button {
 .cartao-login h1 {
   margin: 0;
   color: #ffd100;
-  font-size: clamp(42px, 7vw, 78px);
+  font-size: clamp(36px, 6vw, 68px);
   line-height: 0.95;
   text-shadow: 5px 5px 0 rgba(0, 0, 0, 0.3);
 }
@@ -69,12 +69,12 @@ button {
 .form-login {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 8px;
   width: 100%;
 }
 
 .form-login label {
-  font-size: 28px;
+  font-size: 22px;
   letter-spacing: 2px;
   text-transform: uppercase;
 }
@@ -83,9 +83,9 @@ button {
   width: 100%;
   border: 0;
   border-radius: 16px;
-  padding: 14px 18px;
+  padding: 10px 16px;
   color: #211309;
-  font: 32px Impact, Haettenschweiler, "Arial Black", sans-serif;
+  font: 24px Impact, Haettenschweiler, "Arial Black", sans-serif;
   text-align: center;
   text-transform: uppercase;
 }
@@ -97,7 +97,7 @@ button {
 .botao-login {
   position: static;
   align-self: center;
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
 .texto-inicio {

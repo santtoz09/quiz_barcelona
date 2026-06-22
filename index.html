@@ -13,8 +13,18 @@
           <img class="escudo escudo-login" src="barcelona.png" alt="Escudo do Barcelona" />
           <h1>QUIZ BARCELONA</h1>
           <form id="form-login" class="form-login">
-            <label for="nomeJogador">Digite seu nome</label>
+            <label for="nomeJogador">Nome</label>
             <input id="nomeJogador" name="nomeJogador" type="text" maxlength="30" autocomplete="name" required />
+
+            <label for="emailJogador">E-mail</label>
+            <input id="emailJogador" name="emailJogador" type="text" maxlength="60" autocomplete="email" required />
+
+            <label for="idadeJogador">Idade</label>
+            <input id="idadeJogador" name="idadeJogador" type="number" min="1" autocomplete="off" required />
+
+            <label for="telefoneJogador">Telefone</label>
+            <input id="telefoneJogador" name="telefoneJogador" type="tel" maxlength="20" autocomplete="tel" required />
+
             <button class="botao-principal botao-login" type="submit">Entrar</button>
           </form>
         </div>
