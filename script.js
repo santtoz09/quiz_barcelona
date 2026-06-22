@@ -7,6 +7,9 @@ const perguntas = [
 ];
 
 let nomeJogador = "";
+let emailJogador = "";
+let idadeJogador = "";
+let telefoneJogador = "";
 let numeroPerguntas = 0;
 let pontuacao = 0;
 let podResponder = true;
@@ -23,6 +26,9 @@ const elementos = {
   telaResultado: document.getElementById("tela-resultado"),
   formLogin: document.getElementById("form-login"),
   nomeJogadorInput: document.getElementById("nomeJogador"),
+  emailJogadorInput: document.getElementById("emailJogador"),
+  idadeJogadorInput: document.getElementById("idadeJogador"),
+  telefoneJogadorInput: document.getElementById("telefoneJogador"),
   nomeJogadorAtual: document.getElementById("nomeJogadorAtual"),
   botaoIniciar: document.getElementById("botao-iniciar"),
   botaoReiniciar: document.getElementById("botao-reiniciar"),
@@ -72,9 +78,30 @@ function pararTimer() {
   }
 }
 
+function salvarCadastro() {
+  const dados = { nomeJogador, emailJogador, idadeJogador, telefoneJogador };
+  localStorage.setItem("cadastro", JSON.stringify(dados));
+}
+
+function preencherCadastro() {
+  elementos.nomeJogadorInput.value = nomeJogador;
+  elementos.emailJogadorInput.value = emailJogador;
+  elementos.idadeJogadorInput.value = idadeJogador;
+  elementos.telefoneJogadorInput.value = telefoneJogador;
+}
+
+function limparCadastro() {
+  nomeJogador = "";
+  emailJogador = "";
+  idadeJogador = "";
+  telefoneJogador = "";
+  preencherCadastro();
+  localStorage.removeItem("cadastro");
+}
+
 function salvarSessao() {
-  if (!nomeJogador || !elementos.telaQuiz.classList.contains("ativa")) return;
-  const dados = { nomeJogador, numeroPerguntas, respostasEscolhidas, pontuacao, tempoDecorrido: obterTempoDecorrido() };
+  if (!nomeJogador || !emailJogador || !idadeJogador || !telefoneJogador || !elementos.telaQuiz.classList.contains("ativa")) return;
+  const dados = { nomeJogador, emailJogador, idadeJogador, telefoneJogador, numeroPerguntas, respostasEscolhidas, pontuacao, tempoDecorrido: obterTempoDecorrido() };
   localStorage.setItem("sessao", JSON.stringify(dados));
 }
 
@@ -248,6 +275,11 @@ function iniciarQuiz() {
 
 function restaurarSessao(dadosSessao) {
   nomeJogador = dadosSessao.nomeJogador.trim();
+  emailJogador = dadosSessao.emailJogador ? dadosSessao.emailJogador.trim() : "";
+  idadeJogador = dadosSessao.idadeJogador ? String(dadosSessao.idadeJogador).trim() : "";
+  telefoneJogador = dadosSessao.telefoneJogador ? dadosSessao.telefoneJogador.trim() : "";
+  preencherCadastro();
+  salvarCadastro();
   numeroPerguntas = Math.min(Math.max(dadosSessao.numeroPerguntas, 0), perguntas.length - 1);
   respostasEscolhidas = dadosSessao.respostasEscolhidas.slice(0, perguntas.length);
   pontuacao = dadosSessao.pontuacao;
@@ -267,11 +299,30 @@ function restaurarSessao(dadosSessao) {
 elementos.formLogin.onsubmit = function(e) {
   e.preventDefault();
   const nome = elementos.nomeJogadorInput.value.trim();
+  const email = elementos.emailJogadorInput.value.trim();
+  const idade = elementos.idadeJogadorInput.value.trim();
+  const telefone = elementos.telefoneJogadorInput.value.trim();
   if (!nome) {
     elementos.nomeJogadorInput.focus();
     return;
   }
+  if (!email) {
+    elementos.emailJogadorInput.focus();
+    return;
+  }
+  if (!idade) {
+    elementos.idadeJogadorInput.focus();
+    return;
+  }
+  if (!telefone) {
+    elementos.telefoneJogadorInput.focus();
+    return;
+  }
   nomeJogador = nome;
+  emailJogador = email;
+  idadeJogador = idade;
+  telefoneJogador = telefone;
+  salvarCadastro();
   elementos.nomeJogadorAtual.textContent = nomeJogador;
   exibirTela(elementos.telaInicio);
 };
@@ -280,8 +331,8 @@ elementos.botaoIniciar.onclick = iniciarQuiz;
 
 elementos.botaoReiniciar.onclick = function() {
   localStorage.removeItem("sessao");
+  limparCadastro();
   exibirTela(elementos.telaLogin);
-  elementos.nomeJogadorInput.value = "";
   elementos.nomeJogadorInput.focus();
 };
 
