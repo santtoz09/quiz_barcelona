@@ -345,3 +345,14 @@ if (sessaoSalva) {
 } else {
   exibirTela(elementos.telaLogin);
 }
+
+
+
+
+
+let url = 'http://localhost:3000/backend';
+
+let resp = await fetch(url)
+
+let dados = await resp.json()
+alert(dados.msg)
